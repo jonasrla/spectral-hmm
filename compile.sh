@@ -1,5 +1,5 @@
 cp .tex/* . > /dev/null 2>&1
-biber template
+biber $1
 docker run -ti \
   -v miktex:/miktex/.miktex \
   -v `pwd`:/miktex/work \
