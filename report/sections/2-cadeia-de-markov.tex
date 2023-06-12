@@ -38,24 +38,26 @@ E da mesma forma que a matriz transição, à redundância no vetor $\Pi_0$, poi
 
 Concluí-se que uma \textit{Cadeia de Markov} de $n$ estados é definida por $n^2-1$ parâmetros.
 
-\begin{figure} % Single column figure
+\begin{figure}
 	\includegraphics[width=\linewidth]{markov_chain.png}
-	\caption{Diagrama de estados.}
+	\caption{Exemplo de diagrama de estados de uma \textit{Cadeia de Markov} com $3$}
 	\label{fig:auto_rep}
 \end{figure}
 
-\subsection{Exemplo} \label{sub:exemplo}
+\subsection{Estimativa de parâmetros} \label{sub:exemplo}
 
-Para ilustrar a estimativa dos parâmetros de uma \textit{Cadeia de Markov}, considere o seguinte conjunto sequências
+Considere o seguinte conjunto sequências
 \begin{align*}
 	&ABCABACCACAB         \\
 	&BACABACAAC           \\
 	&BBABAAAACCACABABABAC
 \end{align*}
 
-Para estimar a matriz transição $T$, observe que, há no total que $20$ ocorrências da letra $A$ seguida de algum estado, $10$ da $B$, e $9$ da $C$. Ao se contar cada ocorrência das tuplas $AA$, $AB$, $AC$, e assim por diante, dividindo pela ocorrência do respectivo estado antecessor. Assim a seguinte matriz transição é obtida
+Assumindo a premissa de que tais sequências foram geradas por um processo modelável como \textit{Cadeia de Markov}, os parâmetros de tal cadeia serão estimados. É urgente se observar que as sequências apresentam apenas $3$ estados. Por tanto, a matriz transição $T \mathbb{R}^{3 \times 3}$ e $\Pi_0 \in \mathbb{R}^3$.
+
+No total, há $20$ ocorrências da letra $A$ seguida de algum estado, $10$ da $B$, e $9$ da $C$. Ao se contar cada ocorrência das tuplas $AA$, $AB$, $AC$, e assim por diante, dividindo pela ocorrência do respectivo estado antecessor. Assim a seguinte matriz transição é obtida
 \[
-    \begin{pmatrix}
+    T = \begin{pmatrix}
         \frac{4}{20} & \frac{8}{20} & \frac{8}{20} \\
         \frac{8}{10} & \frac{1}{10} & \frac{1}{10} \\
         \frac{7}{9} & \frac{0}{9} & \frac{2}{9}
@@ -69,21 +71,45 @@ Já para a estimativa do vetor probabilidade de estado inicial $\Pi_0$, o proces
 	\end{pmatrix}
 \]
 
-\subsection{Probabilidade Estacionária}
+\subsection{Probabilidade de uma sequência}
 
-Agora suponha que algum processo é caracterizado como \textit{Cadeia de Markov} tenha matriz transição $T$, então note
-\[
-	(T - I)\mathbf{1} = T\mathbf{1} - I\mathbf{1} = \mathbf{1} - \mathbf{1} = O
-\]
-Isto é, tal matriz é $T - I$ não é linearmente independente e por tanto, tem determinante $0$. Isto implica que $1$ é autovalor da matriz $T$. Por tanto existe um vetor linha $V$ tal que
-\[
-	VT = V
-\]
-Como todas entradas de $T$ são não-negativas, $V$ só pode ter entradas não-negativas. Além disso, podemos multiplicar a igualdade por qualquer escalar em ambos os lados que a igualdade se mantém, por isso podemos forçar que $V\mathbf{1} = 1$. Chama-se $V$ de \textit{Probabilidade Estacionária}, isto é, a distribuição de probabilidade dos estados converge para $V$
+\begin{figure}
+	\includegraphics[width=\linewidth]{seq_markov_chain.png}
+	\caption{Visualização sequencial da \textit{Cadeia de Markov} de distribuição de probabilidade inicial $\Pi_0$ e matriz transição $T$}
+	\label{fig:seq_mc}
+\end{figure}
 
-\subsection{Modelos Alternativos}
-Há também a possibilidade de expandir o modelo adicionando mais estados na dependência do estado seguinte, como Bishop\autocite{Bishop:2006pat} discute, mas isso vem com o custo de mais variáveis para se calcular. A medida que se adiciona $1$ estado na dependência, se multiplica a quantidade de parâmetros por $n$, a quantidade de estados.
+O interesse nesta subseção é de calcular, partindo dos parâmetros que descrevem uma \textit{Cadeia de Markov}, a probabilidade de cada sequência de estados. Seja $(e_i)_{i=1}^t$ um processo de Markov que gere uma sequência de estados de uma \textit{Cadeia de Markov} que tenha probabilidade inicial $\Pi_0$ e uma matriz transferência de estados $T$, como ilustrado na figura \ref{fig:seq_mc}. Como Bishop \autocite{Bishop:2006pat} apresenta, a transferência de estado só depende do estado anterior, que simplifica bastante o cálculo da probabilidade conjunta a partir das probabilidades condicionais
+\begin{gather*}
+	P((e_k)_{k=1}^t) = P(e_1) \prod_{k=2}^t P(e_{k} \vert e_{k-1}) \\
+	\Rightarrow P((e_k)_{k=1}^t) = \Pi_0[i=e_1] \prod_{k=2}^t T[i=e_{k-1},\, j=e_{k}]
+\end{gather*}
 
-Este nível de detalhamento pode tornar o modelo impraticável quando esta expansão se torna muito grande. Além disso, as estimativas dos parâmetros desse modelo passa depender de mais observações. Observe que não há ocorrências do par $CB$ no exemplo visto. Isto pode ter sido causado pelo fato de que o processo não permita essa transição de estado, mas também é possível que essa transição só não tenha sido observada na amostra apresentada.
+No caso do modelo da seção anterior, a sequência $BACABBAC$ tem probabilidade
+\begin{gather*}
+	P(BACABBAC) = P(B) P(A|B) P(C|A) P(A|C) \\
+	P(B|A) P(B|B) P(A|B) P(C|A) \\
+	= 2/3 8/10 8/20 7/9 8/20 1/10 8/10 8/20 \approx 2.212 * 10^{-3}
+\end{gather*}
+
+O leitor mais atento observou que a medida que as sequências crescem elas se tornam mais improváveis, por isso deve haver uma precaução na manipulação dessas probabilidades e evitar comparar sequências de tamanhos diferentes.
+
+% \subsection{Probabilidade Estacionária}
+
+% Finalizaremos fazendo algumas observações sobre convergência desses processos.
+% Agora suponha que algum processo é caracterizado como \textit{Cadeia de Markov} tenha matriz transição $T$, então note
+% \[
+% 	(T - I)\mathbf{1} = T\mathbf{1} - I\mathbf{1} = \mathbf{1} - \mathbf{1} = O
+% \]
+% Isto é, tal matriz é $T - I$ não é linearmente independente e por tanto, tem determinante $0$. Isto implica que $1$ é autovalor da matriz $T$. Por tanto existe um vetor linha $V$ tal que
+% \[
+% 	VT = V
+% \]
+% Como todas entradas de $T$ são não-negativas, $V$ só pode ter entradas não-negativas. Além disso, podemos multiplicar a igualdade por qualquer escalar em ambos os lados que a igualdade se mantém, por isso podemos forçar que $V\mathbf{1} = 1$. Chama-se $V$ de \textit{Probabilidade Estacionária}, isto é, a distribuição de probabilidade dos estados converge para $V$
+
+% \subsection{Modelos com dependência}
+% Há também a possibilidade de expandir o modelo adicionando mais estados na dependência do estado seguinte, como Bishop\autocite{Bishop:2006pat} discute, mas isso vem com o custo de mais variáveis na matriz transferência para se calcular. Se $n$ é número de estados e $d$ o número de extensão de dependência, então, a quantidade de parâmetros necessários para descrever a transição é $n^d(n-1)$
+
+% Este nível de detalhamento pode tornar o modelo impraticável quando esta expansão se torna muito grande. Além disso, as estimativas dos parâmetros desse modelo passa depender de mais observações. No exemplo da seção \ref{sub:exemplo} não há ocorrências do par $CB$. Isto pode ter sido causado pelo fato de que o processo não permita essa transição de estado, mas também é possível que essa transição só não tenha sido observada na amostra apresentada.
 
 \end{document}
