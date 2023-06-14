@@ -44,6 +44,12 @@ Concluí-se que uma \textit{Cadeia de Markov} de $n$ estados é definida por $n^
 	\label{fig:auto_rep}
 \end{figure}
 
+\begin{figure*}[h]
+    \includegraphics[width=\linewidth]{seq_markov_chain.png}
+    \caption{Na visualização sequencial da \textit{Cadeia de Markov} de o primeiro estado é escolhido de acordo com a probabilidade correspondente da coluna $i$ no vetor $\Pi_0$ e cada estado seguinte é escolhido com a probabilidade presente na coluna $j$ e linha $i$ que corresponde ao estado atual da matriz transição $T$}
+    \label{fig:seq_mc}
+\end{figure*}
+
 \subsection{Estimativa de parâmetros} \label{sub:exemplo}
 
 Considere o seguinte conjunto sequências
@@ -73,12 +79,6 @@ Já para a estimativa do vetor probabilidade de estado inicial $\Pi_0$, o proces
 
 \subsection{Probabilidade de uma sequência}
 
-\begin{figure}
-	\includegraphics[width=\linewidth]{seq_markov_chain.png}
-	\caption{Visualização sequencial da \textit{Cadeia de Markov} de distribuição de probabilidade inicial $\Pi_0$ e matriz transição $T$}
-	\label{fig:seq_mc}
-\end{figure}
-
 O interesse nesta subseção é de calcular, partindo dos parâmetros que descrevem uma \textit{Cadeia de Markov}, a probabilidade de cada sequência de estados. Seja $(e_i)_{i=1}^t$ um processo de Markov que gere uma sequência de estados de uma \textit{Cadeia de Markov} que tenha probabilidade inicial $\Pi_0$ e uma matriz transferência de estados $T$, como ilustrado na figura \ref{fig:seq_mc}. Como Bishop \autocite{Bishop:2006pat} apresenta, a transferência de estado só depende do estado anterior, que simplifica bastante o cálculo da probabilidade conjunta a partir das probabilidades condicionais
 \begin{gather*}
 	P((e_k)_{k=1}^t) = P(e_1) \prod_{k=2}^t P(e_{k} \vert e_{k-1}) \\
@@ -89,7 +89,8 @@ No caso do modelo da seção anterior, a sequência $BACABBAC$ tem probabilidade
 \begin{gather*}
 	P(BACABBAC) = P(B) P(A|B) P(C|A) P(A|C) \\
 	P(B|A) P(B|B) P(A|B) P(C|A) \\
-	= 2/3 8/10 8/20 7/9 8/20 1/10 8/10 8/20 \approx 2.212 * 10^{-3}
+	= 2/3 * 8/10 * 8/20 * 7/9 * 8/20 * 1/10 * 8/10 * 8/20
+	\\  \approx 2.212 * 10^{-3}
 \end{gather*}
 
 O leitor mais atento observou que a medida que as sequências crescem elas se tornam mais improváveis, por isso deve haver uma precaução na manipulação dessas probabilidades e evitar comparar sequências de tamanhos diferentes.
