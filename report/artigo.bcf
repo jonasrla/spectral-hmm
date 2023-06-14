@@ -2362,6 +2362,13 @@
   </bcf:bibdata>
   <bcf:section number="0">
     <bcf:citekey order="1" intorder="1">Bishop:2006pat</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">Rabiner:1989tut</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">Rabiner:1989tut</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">Baum:1967AnIW</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">Hsu:20121460</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">Viterbi:1967EBFC</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">ZHU:202127</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">Rabiner:1989tut</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
