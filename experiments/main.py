@@ -1,4 +1,4 @@
-import cProfile
+from time import time
 
 from hmmlearn.hmm import CategoricalHMM
 import numpy as np
@@ -16,79 +16,157 @@ def random_parameters(n_components, n_features):
 
     return (startprob, transmat, emissionprob)
 
-def em_sl_comparison(generator_parameters, em_estimator_parameters, sl_estimator_parameters, n_samples):
-    gen = CategoricalHMM(
-    n_components=generator_parameters['n_components'],
-    n_features=generator_parameters['n_features']
-    )
-    if 'startprob' in generator_parameters:
-        gen.startprob_ = generator_parameters['startprob']
-        gen.transmat_ = generator_parameters['transmat']
-        gen.emissionprob_ = generator_parameters['emissionprob']
-    else:
-        startprob, transmat, emissionprob = random_parameters(
-            generator_parameters['n_components'],
-            generator_parameters['n_features']
+class myCategoricalHMM(CategoricalHMM):
+    def score(self, X, lengths=None):
+        return np.exp(super().score(X, lengths))
+
+def create_generators(**gen_param):
+    if 'startprob' in gen_param:
+        gen = myCategoricalHMM(
+            n_components=gen_param['n_components'],
+            n_features=gen_param['n_features']
         )
-        gen.startprob_ = startprob
-        gen.transmat_ = transmat
-        gen.emissionprob_ = emissionprob
+        gen.startprob_ = gen_param['startprob']
+        gen.transmat_ = gen_param['transmat']
+        gen.emissionprob_ = gen_param['emissionprob']
+        gens = [gen]
+    else:
+        gens = [
+            myCategoricalHMM(
+                n_components=gen_param['n_components'],
+                n_features=gen_param['n_features']
+            ) for i in range(gen_param.get('n_models'))
+        ]
+        for i in range(gen_param.get('n_models')):
+            gens[i].startprob_, gens[i].transmat_, gens[i].emissionprob_ = random_parameters(
+                gen_param['n_components'],
+                gen_param['n_features']
+            )
+    return gens
+
+def create_em_estimators(samples, **em_est_param):
+    n_gens = len(samples)
+    est_fit_t = np.zeros((n_gens, em_est_param['n_models']))
+    em_ests = \
+    [
+        [
+            myCategoricalHMM(
+            n_components=em_est_param['n_components'],
+            n_features=em_est_param['n_features']
+            ) for i in range(em_est_param['n_models'])
+        ] for j in range(n_gens)
+    ]
+    for gen_index in range(n_gens):
+        for em_est_index, em_est in enumerate(em_ests[gen_index]):
+            sample = samples[gen_index]
+            em_data = np.concatenate(sample)
+            em_lenghts = list(map(len, sample))
+            tic = time()
+            em_est.fit(em_data, em_lenghts)
+            tac = time()
+            est_fit_t[gen_index][em_est_index] = (tac-tic)
+    return em_ests, est_fit_t
+
+def create_sl_estimators(samples, **sl_est_param):
+    n_gens = len(samples)
+    est_fit_t = np.zeros((n_gens, sl_est_param['n_models']))
+    sl_ests = \
+    [
+        [
+            SLHMM(
+            num_hidden=sl_est_param['n_components'],
+            num_observ=sl_est_param['n_features']
+            ) for i in range(sl_est_param['n_models'])
+        ] for j in range(n_gens)
+    ]
+    for gen_index in range(n_gens):
+        for sl_est_index, sl_est in enumerate(sl_ests[gen_index]):
+            sample = samples[gen_index]
+            sl_data = [s.T[0] for s in sample]
+            tic = time()
+            sl_est.fit(sl_data)
+            tac = time()
+            est_fit_t[gen_index][sl_est_index] = (tac-tic)
+    return sl_ests, est_fit_t
+
+def abs_prob_error(gen, est, sample):
+    return sum([np.abs(gen.score(s) - est.score(s)) for s in sample])
+
+def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30, metrics=[]):
+    gens = create_generators(**gen_param)
     
-    samples = [gen.sample(np.random.randint(2,30))[0] for i in range(n_samples)]
+    samples = \
+    [
+        [
+            gen.sample(np.random.randint(2,max_t))[0]
+            for i in range(n_samples)
+        ] for gen in gens
+    ]
 
-    em_est = CategoricalHMM(
-        n_components=em_estimator_parameters['n_components'],
-        n_features=em_estimator_parameters['n_features']
-    )
-    sl_est = SLHMM(
-        num_hidden=sl_estimator_parameters['n_components'], num_observ=sl_estimator_parameters['n_features']
-    )
-    em_data = np.concatenate(samples)
-    em_lenghts = list(map(len, samples))
+    em_ests, em_est_fit_t = create_em_estimators(samples, **em_est_param)
+    sl_ests, sl_est_fit_t = create_sl_estimators(samples, **sl_est_param)
 
-    em_pr = cProfile.Profile()
-    em_pr.bias = 2.37677932206823e-06
-    em_pr.enable()
-    em_est.fit(em_data, em_lenghts)
-    em_pr.disable()
+    test_samples = \
+    [
+        [
+            gen.sample(np.random.randint(2,max_t))[0]
+            for i in range(n_samples)
+        ] for gen in gens
+    ]
+    exp_data = list()
+    for gen_index, gen in enumerate(gens):
+        exp_data.append(dict)
+        exp_data[gen_index] = dict()
+        for metric in metrics:
+            metric_name = metric.__name__
+            exp_data[gen_index][metric_name] = dict()
+            exp_data[gen_index][metric_name]['em_ests'] = [
+                metric(gen, em_est, test_samples[gen_index])
+                for em_est in em_ests[gen_index]
+            ]
+            exp_data[gen_index][metric_name]['sl_ests'] = [
+                metric(gen, sl_est, test_samples[gen_index])
+                for sl_est in sl_ests[gen_index]
+            ]
+        exp_data[gen_index]['gen_startprob'] = gen.startprob_
+        exp_data[gen_index]['gen_transmat'] = gen.transmat_
+        exp_data[gen_index]['gen_emissionprob'] = gen.emissionprob_
 
-    sl_data = [s.T[0] for s in samples]
-    sl_pr = cProfile.Profile()
-    sl_pr.bias = 2.37677932206823e-06
-    sl_pr.enable()
-    sl_est.fit(sl_data)
-    sl_pr.disable()
-    return gen, em_est, sl_est
+    return exp_data
 
 
 if __name__ == '__main__':
-    gen, em_est, sl_est = em_sl_comparison(
-        generator_parameters={
+    exp_data = em_sl_comparison(
+        gen_param={
             'n_components': 3,
             'n_features': 5,
-            'startprob': np.array([0.6,0.4,0.0]),
-            'transmat': np.array(
-                [
-                    [0.7,0.3,0.0],
-                    [0.3,0.5,0.2],
-                    [0.5,0.4,0.1]
-                ]
-            ),
-            'emissionprob': np.array(
-                [
-                    [0.2,0.3,0.0,0.0,0.5],
-                    [0.5,0.0,0.0,0.3,0.2],
-                    [0.5,0.0,0.3,0.0,0.2],
-                ])
-
+            'n_models': 10
+            # 'startprob': np.array([0.6,0.4,0.0]),
+            # 'transmat': np.array(
+            #     [
+            #         [0.7,0.3,0.0],
+            #         [0.3,0.5,0.2],
+            #         [0.5,0.4,0.1]
+            #     ]
+            # ),
+            # 'emissionprob': np.array(
+            #     [
+            #         [0.2,0.3,0.0,0.0,0.5],
+            #         [0.5,0.0,0.0,0.3,0.2],
+            #         [0.5,0.0,0.3,0.0,0.2],
+            #     ])
         },
-        em_estimator_parameters={
+        em_est_param={
             'n_components': 3,
-            'n_features': 5
+            'n_features': 5,
+            'n_models': 10
         },
-        sl_estimator_parameters={
+        sl_est_param={
             'n_components': 3,
-            'n_features': 5
+            'n_features': 5,
+            'n_models': 10
         },
-        n_samples=10000
+        n_samples=3000,
+        max_t=30,
+        metrics=[abs_prob_error]
     )
