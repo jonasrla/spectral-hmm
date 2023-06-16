@@ -113,7 +113,7 @@ def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30,
     [
         [
             gen.sample(np.random.randint(2,max_t))[0]
-            for i in range(n_samples*0.3)
+            for i in range(int(n_samples*0.3))
         ] for gen in gens
     ]
     exp_data = list()
@@ -123,28 +123,17 @@ def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30,
         for metric in metrics:
             metric_name = metric.__name__
             exp_data[gen_index][metric_name] = dict()
-            em_error = np.array([
+            exp_data[gen_index][metric_name]['em_ests'] = [
                 metric(gen, em_est, test_samples[gen_index])
                 for em_est in em_ests[gen_index]
-            ])
-            exp_data[gen_index][metric_name]['em_ests_avg'] = em_error.mean()
-            exp_data[gen_index][metric_name]['em_ests_std'] = em_error.std()
-            exp_data[gen_index][metric_name]['em_ests_min'] = em_error.min()
-            exp_data[gen_index][metric_name]['em_ests_max'] = em_error.max()
+            ]
             exp_data[gen_index][metric_name]['sl_est'] = \
                 metric(gen, sl_ests[gen_index], test_samples[gen_index])
-        # exp_data[gen_index]['gen_startprob'] = gen.startprob_.tolist()
-        # exp_data[gen_index]['gen_transmat'] = gen.transmat_.tolist()
-        # exp_data[gen_index]['gen_emissionprob'] = gen.emissionprob_.tolist()
-        exp_data[gen_index]['em_est_time_avg'] = em_est_fit_t.mean()
-        exp_data[gen_index]['em_est_time_std'] = em_est_fit_t.std()
-        exp_data[gen_index]['em_est_time_min'] = em_est_fit_t.min()
-        exp_data[gen_index]['em_est_time_max'] = em_est_fit_t.max()
-
-        exp_data[gen_index]['sl_est_time_avg'] = sl_est_fit_t.mean()
-        exp_data[gen_index]['sl_est_time_std'] = sl_est_fit_t.std()
-        exp_data[gen_index]['sl_est_time_min'] = sl_est_fit_t.min()
-        exp_data[gen_index]['sl_est_time_max'] = sl_est_fit_t.max()
+        exp_data[gen_index]['gen_startprob'] = gen.startprob_.tolist()
+        exp_data[gen_index]['gen_transmat'] = gen.transmat_.tolist()
+        exp_data[gen_index]['gen_emissionprob'] = gen.emissionprob_.tolist()
+        exp_data[gen_index]['em_est_time'] = em_est_fit_t.tolist()
+        exp_data[gen_index]['sl_est_time'] = sl_est_fit_t.tolist()
     
     return exp_data
 
