@@ -89,11 +89,11 @@ def create_sl_estimators(samples, **sl_est_param):
     return sl_ests, est_fit_t
 
 def abs_prob_error(gen, est, sample):
-    return sum([np.abs(gen.score(s) - est.score(s)) for s in sample])
+    return sum([np.abs(gen.score(s) - est.score(s)) for s in sample]) / len(sample)
 
 def abs_norm_prob_error(gen, est, sample):
     return sum([np.power(np.abs(gen.score(s) - est.score(s)), 1/len(s))
-                for s in sample])
+                for s in sample]) / len(sample)
 
 def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30, metrics=[]):
     gens = create_generators(**gen_param)
