@@ -113,7 +113,7 @@ def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30,
     [
         [
             gen.sample(np.random.randint(2,max_t))[0]
-            for i in range(n_samples)
+            for i in range(n_samples*0.3)
         ] for gen in gens
     ]
     exp_data = list()
