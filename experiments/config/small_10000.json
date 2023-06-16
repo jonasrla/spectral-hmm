@@ -1,0 +1,17 @@
+{
+    "gen_param": {
+        "n_components": 4,
+        "n_features": 8,
+        "n_models": 15
+    },
+    "em_est_param": {
+        "n_components": 4,
+        "n_features": 8,
+        "n_models": 15
+    },
+    "sl_est_param": {
+        "n_components": 4,
+        "n_features": 8
+    },
+    "n_samples": 10000
+}

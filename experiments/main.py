@@ -1,4 +1,6 @@
 from time import time
+import json
+from argparse import ArgumentParser
 
 from hmmlearn.hmm import CategoricalHMM
 import numpy as np
@@ -69,28 +71,29 @@ def create_em_estimators(samples, **em_est_param):
 
 def create_sl_estimators(samples, **sl_est_param):
     n_gens = len(samples)
-    est_fit_t = np.zeros((n_gens, sl_est_param['n_models']))
+    est_fit_t = np.zeros((n_gens))
     sl_ests = \
     [
-        [
-            SLHMM(
+        SLHMM(
             num_hidden=sl_est_param['n_components'],
-            num_observ=sl_est_param['n_features']
-            ) for i in range(sl_est_param['n_models'])
-        ] for j in range(n_gens)
+            num_observ=sl_est_param['n_features'])
+        for i in range(n_gens)
     ]
-    for gen_index in range(n_gens):
-        for sl_est_index, sl_est in enumerate(sl_ests[gen_index]):
-            sample = samples[gen_index]
-            sl_data = [s.T[0] for s in sample]
-            tic = time()
-            sl_est.fit(sl_data)
-            tac = time()
-            est_fit_t[gen_index][sl_est_index] = (tac-tic)
+    for gen_index, sl_est in enumerate(sl_ests):
+        sample = samples[gen_index]
+        sl_data = [s.T[0] for s in sample]
+        tic = time()
+        sl_est.fit(sl_data)
+        tac = time()
+        est_fit_t[gen_index] = (tac-tic)
     return sl_ests, est_fit_t
 
 def abs_prob_error(gen, est, sample):
     return sum([np.abs(gen.score(s) - est.score(s)) for s in sample])
+
+def abs_norm_prob_error(gen, est, sample):
+    return sum([np.power(np.abs(gen.score(s) - est.score(s)), 1/len(s))
+                for s in sample])
 
 def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30, metrics=[]):
     gens = create_generators(**gen_param)
@@ -120,53 +123,45 @@ def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30,
         for metric in metrics:
             metric_name = metric.__name__
             exp_data[gen_index][metric_name] = dict()
-            exp_data[gen_index][metric_name]['em_ests'] = [
+            em_error = np.array([
                 metric(gen, em_est, test_samples[gen_index])
                 for em_est in em_ests[gen_index]
-            ]
-            exp_data[gen_index][metric_name]['sl_ests'] = [
-                metric(gen, sl_est, test_samples[gen_index])
-                for sl_est in sl_ests[gen_index]
-            ]
-        exp_data[gen_index]['gen_startprob'] = gen.startprob_
-        exp_data[gen_index]['gen_transmat'] = gen.transmat_
-        exp_data[gen_index]['gen_emissionprob'] = gen.emissionprob_
+            ])
+            exp_data[gen_index][metric_name]['em_ests_avg'] = em_error.mean()
+            exp_data[gen_index][metric_name]['em_ests_std'] = em_error.std()
+            exp_data[gen_index][metric_name]['em_ests_min'] = em_error.min()
+            exp_data[gen_index][metric_name]['em_ests_max'] = em_error.max()
+            exp_data[gen_index][metric_name]['sl_est'] = \
+                metric(gen, sl_ests[gen_index], test_samples[gen_index])
+        # exp_data[gen_index]['gen_startprob'] = gen.startprob_.tolist()
+        # exp_data[gen_index]['gen_transmat'] = gen.transmat_.tolist()
+        # exp_data[gen_index]['gen_emissionprob'] = gen.emissionprob_.tolist()
+        exp_data[gen_index]['em_est_time_avg'] = em_est_fit_t.mean()
+        exp_data[gen_index]['em_est_time_std'] = em_est_fit_t.std()
+        exp_data[gen_index]['em_est_time_min'] = em_est_fit_t.min()
+        exp_data[gen_index]['em_est_time_max'] = em_est_fit_t.max()
 
+        exp_data[gen_index]['sl_est_time_avg'] = sl_est_fit_t.mean()
+        exp_data[gen_index]['sl_est_time_std'] = sl_est_fit_t.std()
+        exp_data[gen_index]['sl_est_time_min'] = sl_est_fit_t.min()
+        exp_data[gen_index]['sl_est_time_max'] = sl_est_fit_t.max()
+    
     return exp_data
 
-
 if __name__ == '__main__':
+    parser = ArgumentParser(prog='Spectral Learning Experiment')
+    parser.add_argument('-o', '--output')
+    parser.add_argument('-c', '--config')
+    args = parser.parse_args()
+    with open(args.config, 'r') as f:
+        config = json.load(f)
     exp_data = em_sl_comparison(
-        gen_param={
-            'n_components': 3,
-            'n_features': 5,
-            'n_models': 10
-            # 'startprob': np.array([0.6,0.4,0.0]),
-            # 'transmat': np.array(
-            #     [
-            #         [0.7,0.3,0.0],
-            #         [0.3,0.5,0.2],
-            #         [0.5,0.4,0.1]
-            #     ]
-            # ),
-            # 'emissionprob': np.array(
-            #     [
-            #         [0.2,0.3,0.0,0.0,0.5],
-            #         [0.5,0.0,0.0,0.3,0.2],
-            #         [0.5,0.0,0.3,0.0,0.2],
-            #     ])
-        },
-        em_est_param={
-            'n_components': 3,
-            'n_features': 5,
-            'n_models': 10
-        },
-        sl_est_param={
-            'n_components': 3,
-            'n_features': 5,
-            'n_models': 10
-        },
-        n_samples=3000,
+        gen_param=config['gen_param'],
+        em_est_param=config['em_est_param'],
+        sl_est_param=config['sl_est_param'],
+        n_samples=config['n_samples'],
         max_t=30,
-        metrics=[abs_prob_error]
+        metrics=[abs_prob_error, abs_norm_prob_error]
     )
+    with open(args.output, 'w') as f:
+        json.dump(exp_data, f, indent=2)
