@@ -1,10 +1,13 @@
 from time import time
 import json
 from argparse import ArgumentParser
+import logging
 
 from hmmlearn.hmm import CategoricalHMM
 import numpy as np
 from ext.HMM import SLHMM
+
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 def random_parameters(n_components, n_features):
     startprob = np.random.rand(n_components)
@@ -23,6 +26,7 @@ class myCategoricalHMM(CategoricalHMM):
         return np.exp(super().score(X, lengths))
 
 def create_generators(**gen_param):
+    logging.info('Creating Generator...')
     if 'startprob' in gen_param:
         gen = myCategoricalHMM(
             n_components=gen_param['n_components'],
@@ -44,9 +48,11 @@ def create_generators(**gen_param):
                 gen_param['n_components'],
                 gen_param['n_features']
             )
+    logging.info('Finished!')
     return gens
 
 def create_em_estimators(samples, **em_est_param):
+    logging.info('Creating EM Estimators...')
     n_gens = len(samples)
     est_fit_t = np.zeros((n_gens, em_est_param['n_models']))
     em_ests = \
@@ -59,7 +65,9 @@ def create_em_estimators(samples, **em_est_param):
         ] for j in range(n_gens)
     ]
     for gen_index in range(n_gens):
+        logging.info(f'Training EM Estimator for Generator {gen_index}...')
         for em_est_index, em_est in enumerate(em_ests[gen_index]):
+            logging.info(f'Training EM Estimator {em_est_index}...')
             sample = samples[gen_index]
             em_data = np.concatenate(sample)
             em_lenghts = list(map(len, sample))
@@ -67,9 +75,13 @@ def create_em_estimators(samples, **em_est_param):
             em_est.fit(em_data, em_lenghts)
             tac = time()
             est_fit_t[gen_index][em_est_index] = (tac-tic)
+            logging.info(f'Done with EM Estimator {em_est_index}!')
+        logging.info(f'Done with Generator {gen_index}...')
+    logging.info('Finished!')
     return em_ests, est_fit_t
 
 def create_sl_estimators(samples, **sl_est_param):
+    logging.info('Creating SL Estimators...')
     n_gens = len(samples)
     est_fit_t = np.zeros((n_gens))
     sl_ests = \
@@ -80,22 +92,32 @@ def create_sl_estimators(samples, **sl_est_param):
         for i in range(n_gens)
     ]
     for gen_index, sl_est in enumerate(sl_ests):
+        logging.info(f'Training SL Estimator for Generator {gen_index}...')
         sample = samples[gen_index]
         sl_data = [s.T[0] for s in sample]
         tic = time()
         sl_est.fit(sl_data)
         tac = time()
         est_fit_t[gen_index] = (tac-tic)
+        logging.info(f'Done with Generator {gen_index}...')
+    logging.info('Finished!')
     return sl_ests, est_fit_t
 
 def abs_prob_error(gen, est, sample):
-    return sum([np.abs(gen.score(s) - est.score(s)) for s in sample]) / len(sample)
+    logging.info('Calculating Absolute Probability Error ...')
+    error = sum([np.abs(gen.score(s) - est.score(s)) for s in sample]) / len(sample)
+    logging.info('Done!')
+    return error
 
 def abs_norm_prob_error(gen, est, sample):
-    return sum([np.power(np.abs(gen.score(s) - est.score(s)), 1/len(s))
+    logging.info('Calculating Normalized Absolute Probability Error ...')
+    error = sum([np.power(np.abs(gen.score(s) - est.score(s)), 1/len(s))
                 for s in sample]) / len(sample)
+    logging.info('Done!')
+    return error
 
 def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30, metrics=[]):
+    logging.info('Starting comparisons...')
     gens = create_generators(**gen_param)
     
     samples = \
@@ -122,6 +144,7 @@ def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30,
         exp_data[gen_index] = dict()
         for metric in metrics:
             metric_name = metric.__name__
+            logging.info(f'Starting metric {metric_name} for Generator {gen_index}...')
             exp_data[gen_index][metric_name] = dict()
             exp_data[gen_index][metric_name]['em_ests'] = [
                 metric(gen, em_est, test_samples[gen_index])
@@ -129,12 +152,13 @@ def em_sl_comparison(gen_param, em_est_param, sl_est_param, n_samples, max_t=30,
             ]
             exp_data[gen_index][metric_name]['sl_est'] = \
                 metric(gen, sl_ests[gen_index], test_samples[gen_index])
+            logging.info(f'Done metric {metric_name} for Generator {gen_index}!')
         exp_data[gen_index]['gen_startprob'] = gen.startprob_.tolist()
         exp_data[gen_index]['gen_transmat'] = gen.transmat_.tolist()
         exp_data[gen_index]['gen_emissionprob'] = gen.emissionprob_.tolist()
         exp_data[gen_index]['em_est_time'] = em_est_fit_t.tolist()
         exp_data[gen_index]['sl_est_time'] = sl_est_fit_t.tolist()
-    
+    logging.info('Finished comparisons!')
     return exp_data
 
 if __name__ == '__main__':
