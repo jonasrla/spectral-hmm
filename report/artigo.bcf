@@ -2369,8 +2369,10 @@
     <bcf:citekey order="6" intorder="1">Viterbi:1967EBFC</bcf:citekey>
     <bcf:citekey order="7" intorder="1">ZHU:202127</bcf:citekey>
     <bcf:citekey order="8" intorder="1">Rabiner:1989tut</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">Zhao:2014ASL</bcf:citekey>
-    <bcf:citekey order="10" intorder="1">Blass:2021abef4d</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">Baum:1977tb01600</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">Rabiner:1989tut</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">Zhao:2014ASL</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">Blass:2021abef4d</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

@@ -38,7 +38,7 @@ Além de todos os elementos já presentes na \textit{Cadeia de Markov}:
 são adicionados os elementos referentes aos símbolos visíveis
 \begin{itemize}
     \item quantidade de símbolos observáveis $o_i$ emitido pelo processo $m \in \mathbb{N}$
-    \item matriz distribuição de probabilidade dos símbolos observáveis em cada estado $O \in \mathbb{R}^{m \times n}$
+    \item matriz distribuição de probabilidade dos símbolos observáveis em cada estado, ou matriz emissão $O \in \mathbb{R}^{m \times n}$
 \end{itemize}
 A iteração desses elementos estão representados na figura \ref{fig:seq_hmm} que ilustra a operação sequencial de um processo modelado por um \textit{Modelo Oculto de Markov}
 
@@ -57,10 +57,8 @@ A primeira pergunta já teve uma investigação inicial para o caso da \textit{C
 
 Já a segunda pergunta, pode ser resolvida pelo \textit{Algoritmo de Viterbi} \autocite{Viterbi:1967EBFC} que escolhe o estado seguinte que maximiza o $P((h_i)_{i=1}^t \vert (o_i)_{i=1}^t, ((\Pi_0, T, O)))$. A complexidade computacional do algoritmo também é $O(n^2t)$, como estima C. Zhu\autocite{ZHU:202127}. Essa análise permite avaliar as estruturas do modelo. Quando o modelo está sendo treinado, os parâmetros a serem aprendidos são criados sem significado explícito, esta avaliação nos permite entender que estados ocultos capturam que aspectos do modelo. É importante destacar que, apesar da popularidade de \textit{Viterbi} não existe uma métrica única para avaliar essa resposta, o próprio Rabiner \autocite{Rabiner:1989tut} ilustra outro critério, escolher a sequência de estados ocultos os quais cada estado é individualmente o mais provável dado o tempo, porém o autor também aponta que é possível que tal abordagem possa chegar em sequências possuem estados ocultos consecutivos com probabilidade de transferência nula entre eles.
 
-A terceira finalmente a terceira pergunta interessa especialmente para Rabiner, pois a ele interessa alguma solução para melhorar a qualidade das previsões do modelo iterativamente que interessa para métodos como o de \textit{Baum-Weich}, não interessa para o algoritmo espectral de Hsu.
+A terceira, finalmente, está vinculada aos métodos iterativos de otimização, tal como \textit{Baum-Weich}\autocite{Baum:1977tb01600}, que o próprio Rabiner expõe em seu tutorial\autocite{Rabiner:1989tut}. Em contraste, a estratégia de aprendizagem espectral de Hsu, não depende deste problema, pois para ser treinada, será necessário medir frequências relativas aos três primeiros símbolos observáveis.
 
-% Apesar do foco deste trabalho sejam os \textit{Modelos Ocultos de Markov}, a seção anterior nos deu algumas ferramentas importantes para compreender o tema principal. É chamado de \textit{Modelo Oculto de Markov} o processo estocástico no qual são observados elementos que são sorteados de acordo com o estado de uma \textit{Cadeia de Markov}.
-
-
+Apesar de não citado por Rabiner, também destaco que modelos estimados devem ser capazes de gerar sequências semelhantes ao que gerador. Note que este problema não é trivial se a estrutura geradora tiver sequências proibidas.
 
 \end{document}
