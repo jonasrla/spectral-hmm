@@ -103,7 +103,7 @@ def save_plot(data, metric, name, size):
     ax.yaxis.set_label_text(metric_label[metric])
     ax.set_title(f'Comparação entre Modelos com Paramêtros {tamanho[size]}')
 
-    plt.savefig(name)
+    fig.savefig(name, bbox_inches='tight')
 
 
 if __name__ == '__main__':
