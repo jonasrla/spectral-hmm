@@ -1,0 +1,34 @@
+<mxfile host="Electron" modified="2023-06-18T04:11:55.281Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.4.0 Chrome/112.0.5615.204 Electron/24.5.1 Safari/537.36" etag="_ItIYzun72XXJa7N16I1" version="21.4.0" type="device">
+  <diagram name="Página-1" id="pHH0ZzDFDJqh0DcEbOoQ">
+    <mxGraphModel dx="794" dy="574" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="Rfu_WVefL8TrnxUtNdRy-1" target="Rfu_WVefL8TrnxUtNdRy-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=ERone;startFill=0;" edge="1" parent="1" source="Rfu_WVefL8TrnxUtNdRy-1" target="Rfu_WVefL8TrnxUtNdRy-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-1" value="Gerador" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="190" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-3" value="Métrica" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="250" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="Rfu_WVefL8TrnxUtNdRy-4" target="Rfu_WVefL8TrnxUtNdRy-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-4" value="Dados de&lt;br&gt;Comparação" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="30" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="Rfu_WVefL8TrnxUtNdRy-6" target="Rfu_WVefL8TrnxUtNdRy-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rfu_WVefL8TrnxUtNdRy-6" value="Estimador" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="130" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
