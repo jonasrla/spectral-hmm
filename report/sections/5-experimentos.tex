@@ -2,6 +2,75 @@
 
 \begin{document}
 
+\begin{figure*}
+    \centering
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/small_time}
+        \caption{Tempo de treinamento para modelos pequenos}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/medium_time}
+        \caption{Tempo de treinamento para modelos médios}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/large_time}
+        \caption{Tempo de treinamento para modelos grandes}
+    \end{subfigure}
+       \caption{Tempo a medida que o tamanho do treinamento aumenta }
+       \label{fig:time}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/small_abs_prob_error}
+        \caption{Erro médio absoluto para modelos pequenos}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/medium_abs_prob_error}
+        \caption{Erro médio absoluto para modelos médios}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/large_abs_prob_error}
+        \caption{Erro médio absoluto para modelos grandes}
+    \end{subfigure}
+       \caption{Erro médio absoluto a medida que o tamanho do treinamento aumenta }
+       \label{fig:abs_prob}
+\end{figure*}
+
+\begin{figure*}
+    \centering
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/small_abs_norm_prob_error}
+        \caption{Erro médio absoluto normalizado para modelos pequenos}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/medium_abs_norm_prob_error}
+        \caption{Erro médio absoluto normalizado para modelos médios}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/resultados/large_abs_norm_prob_error}
+        \caption{Erro médio absoluto normalizado para modelos grandes}
+    \end{subfigure}
+       \caption{Erro médio absoluto normalizado a medida que o tamanho do treinamento aumenta }
+       \label{fig:abs_norm_prob}
+\end{figure*}
+
 \begin{table*} 
     \caption{Configuração das sequências de comparações}
     \centering
@@ -36,7 +105,7 @@ Este experimento tem como o objetivo comparar a precisão e a velocidade de trei
     \label{fig:comp}
 \end{figure}
 
-O experimento se inicia com o treinamento dos modelos como representado na figura \ref{fig:trein}. Para cada, modelo gerador, parametrizado por matrizes aleatórias, são geradas sequências a serem utilizadas pelos modelos. Neste passo foi medido o tempo de treinamento dos modelos.
+O experimento se inicia com o treinamento dos modelos como representado na figura \ref{fig:trein}. Para cada, modelo gerador, parametrizado por matrizes aleatórias, são geradas sequências de tamanho aleatório, entre $2$ e $30$ elementos, a serem utilizadas pelos modelos. Neste passo foi medido o tempo de treinamento dos modelos.
 
 Num segundo momento, serão feitas as comparações entre as estimativas de probabilidade de cada modelo como representada na figura \ref{fig:comp}. Foram utilizadas duas formas de medir o erro, a média da diferença absoluta dos erros
 \[
@@ -63,6 +132,10 @@ Todas as medidas de tempo foram feitas com os computadores de nuvem, que não co
 
 \subsection{Resultados}
 
+Como consta na figura \ref{fig:time}, existe um grande contraste entre o custo de treinamento de estimadores \textit{EM} e \textit{SL}. Aquele é muito mais sensível ao aumento da quantidade de sequências.
 
+Já no erro médio absoluto, o estimador \textit{SL} apresenta desvantagem. Apesar de ser bem sucedido em aprender modelos pequenos, ou pelo menos, aproximadamente, tão bem sucedido quanto \textit{EM}, na figura \ref{fig:abs_prob} para modelos maiores, os estimadores \textit{SL} começam em desvantagem, mas se aproximam do erro dos estimadores \textit{EM} a medida que o tamanho dos dados de treinamento aumentam. Apesar desta perspectiva otimista, as coisas pioram para os estimadores \textit{SL} na figura \ref{fig:abs_norm_prob}.
+
+Como já discutido nas metodologias, o erro médio absoluto normalizado compensa o tamanho da sequência ao medir o erro. Apesar de algumas amostras demonstrarem um tendência de redução da diferença entre os erros, a distância decresce muito lentamente. Parece que, esta técnica erra muito ao estimar a probabilidade de sequências maiores.
 
 \end{document}
