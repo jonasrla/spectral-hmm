@@ -2,6 +2,10 @@
 
 \begin{document}
 
-Além dos resultados apresentados, esta técnica corre o risco de cair em soluções com probabilidades negativas, como apontam H. Zhao e P. Poupart \autocite{Zhao:2014ASL}. Disto pode-se ou tentar adicionar novas restrições para a solução do problema, impedindo que se chegue num resultado negativo, ou até progredir na direção de uma teoria de probabilidade que comporte probabilidades negativas, como A. Blass e Y. Gurevich \autocite{Blass:2021abef4d} apresentam.
+Além dos resultados apresentados, esta técnica corre o risco de cair em soluções com probabilidades negativas, como apontam H. Zhao e P. Poupart \autocite{Zhao:2014ASL}. Este tipo de problema também apareceu nos experimentos, que inclusive forçou a necessidade do uso da própria probabilidade, já que o $\log$ só está definido para positivos. Disto pode-se ou tentar adicionar novas restrições para a solução do problema que impeçam que se chegue num resultado negativo, ou simplesmente verificar se essas ocorrências diminuem em modelos mais bem treinados. Apesar de não ser natural pensar numa instância de estado com probabilidade negativa, existem situações as quais os estados da probabilidade não se revelam e que permitem a existência de um estado teórico não observado negativo, como Feyman ilustra \autocite{Feynman:1987FEYNP}.
+
+Muitas outras perguntas também podem ser investigadas empiricamente, como o comportamento do algoritmo quando o gerador desrespeita as condições 1. É possível os valores negativos observados por H. Zhao tenham sido gerados por isso.
+
+Outro experimento interessante seria comparar modelos treinados com sequências de apenas 3 valores, já que isso representa uma vantagem para os estimadores \textit{EM} que se utilizam da sequência completa
 
 \end{document}
