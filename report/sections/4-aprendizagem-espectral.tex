@@ -2,4 +2,54 @@
 
 \begin{document}
 
+No trabalho \textit{A Spectral Algorithm for Learning Hidden Markov Models}, D. Hsu, S. M. Kakade e T. Zhang apresentam uma abordagem de representação e estimativa de \textit{Modelos Ocultos de Markov}. Serão apresentadas nessa as principais ideias e notações da abordagem deles.
+
+Já nas discussões preliminares os autores apresentam a \textit{Condição 1} para o funcionamento do algoritmo: $\Pi_0 > 0$ e $rank(O) = rank(T) = n$. Segundo os autores, essa condição serve para evitar que distribuição de um dos estados ocultos possa ser gerada pela combinação convexa de outros estados ocultos.
+
+\subsection{Apresentação do Modelo}
+
+Dos problemas apresentados na seção anterior, este modelo é capaz de resolver todos menos problema da maximização da probabilidade já foi discutido na seção anterior
+
+Sejam $P_1 \in \mathbb{R}^m$, $P_{2,1} \in \mathbb{R}^{m \times m}$ e $P_{3,x,1} \in \mathbb{R}^{m \times m}$ no qual $x$ é um elemento do conjunto dos símbolos observáveis. Seguiremos usando $m$ como o número de símbolos observáveis. Define-se cada entrada do vetor e das matrizes como
+\begin{align*}
+    & P_1[i] = Pr(o_1 = i) \\
+    & P_{2,1}[i,j] = Pr(o_2=i, o_1=j) \\
+    & P_{3,x,1}[i,j] = Pr(o_3=i, o_2=x, o_1=j)
+\end{align*}
+No qual $Pr$ é a frequência conjunta na qual cada símbolo observável é emitido. Note que só são necessárias as três primeiras entradas da sequência para esta definição.
+
+Além disso, defini-se a matriz $U \in \mathbb{R}^{m \times n}$ como a matriz tal que $U^{\mathrm T} O$ é invertível, em seguida os autores sugerem um candidato natural: a matriz esquerda de vetores singulares reduzida de $P_{2,1}$, convido o leitor a consultar a demonstração do \textit{Lema 2} que prova este fato.
+
+Dadas as definições, é possível apresentar a nova representação do modelo
+\begin{align*}
+    & \vec{b}_1 = U^{\mathrm T} P_1 \\
+    & \vec{b}_{\infty} = (P_{2,1}^{\mathrm T} U)^+ P_1 \\
+    & B_x = (U^{\mathrm T} P_{3,x,1})(U^{\mathrm T} P_{2,1})^+
+\end{align*}
+
+\subsubsection{Distribuição de Probabilidade Conjunta}
+
+Finalmente, a distribuição a ser estimada por essa representação é dada por
+\[
+    Pr((o_i)_{i=1}^t) = \vec{b}_{\infty}^{\mathbb T} \prod_{i=1}^{t} B_{o_{t+1-i}} \vec{b}_1
+\]
+A demonstração da validade dessa relação é provada no \textit{Lema 3}.
+
+\subsubsection{Demais problemas}
+
+O \textit{Lema 4} apresenta uma forma de calcular a recorrência de $\vec{b}_t$
+\[
+    \vec{b}_{t+1} = \frac{B_{o_t} \vec{b}_t}{\vec{b}_{\infty}^{\mathbb T} B_{o_t} \vec{b}_t}
+\]
+Com esta identidade é possível calcular a relação de $\vec{b}_{t}$ e as distribuições de probabilidade do estado oculto, dada a sequência observada
+\[
+    \vec{b}_{t} = (U^{\mathrm T} Pr(h_t \vert (o_i)_{i=1}^{t-1})
+\]
+O problema do \textit{Random Walk} pode ser reduzido ao problema da probabilidade condicional, isto é, dada uma sequência de observações, esta probabilidade é dada por
+\[
+    Pr(o_t \vert (o_i)_{i=1}^{t-1}) = \vec{b}_{\infty}^{\mathrm T} B_{o_t} \vec{b}_t
+\]
+
+Este trabalho, se dedicou em medir principalmente o sucesso da estimativa da \textit{Distribuição de Probabilidade Conjunta} empiricamente
+
 \end{document}
